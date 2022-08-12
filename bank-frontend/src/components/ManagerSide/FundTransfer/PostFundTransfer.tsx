@@ -10,7 +10,7 @@ const WithdrawPost = (props: WithdrawProps) => {
         console.log(fromAccount,toAccount,amount);
         try {
             const response = await axios.post(
-                'http://localhost:9092/api/manager/fundTransfer',
+                'http://localhost:9092/api/customer/fundTransfer',
                 {
                     transactionAmount: amount,
                     fromAccount: {

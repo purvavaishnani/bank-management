@@ -6,7 +6,7 @@ type depositProps = {
     accNo: string,
     onDeposit: (
         amount: string,
-        updateAmount: string
+        accNo: string
         ) => void;
 };
 
@@ -17,14 +17,15 @@ const Deposit = (props:depositProps) => {
       navigate("/home");
     };
 
-    const {accNo} = useParams();
+    const [accNo,setAccNo] = useState('');
     const [amount, setAmount] = useState('');
-    const [updateAmount, setUpdateAmount] = useState('');
+    // const [updateAmount, setUpdateAmount] = useState('');
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        props.onDeposit(amount, updateAmount);
+        props.onDeposit(amount, accNo);
         setAmount('');
+        setAccNo('');
     };
 
     const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,13 +33,13 @@ const Deposit = (props:depositProps) => {
         setAmount(e.target.value);
     };
 
-    const handleToAddChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAccNoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         console.log(e);
-        setUpdateAmount(e.target.value);
+        setAccNo(e.target.value);
     };
 
     return (
-        <div className='deposit-page'>
+        <div className='addAccount-page'>
             <div className='card'>
                 <div className='card-body pd-card'>
                     <form onSubmit={handleSubmit} className='col-12'>
@@ -51,22 +52,22 @@ const Deposit = (props:depositProps) => {
                                 value={accNo}
                                 size={30}
                                 className="form-control col-sm-10"
+                                onChange={handleAccNoChange}
                             /> <br/><br/>
                         </div>
                 
                     <div className="form-row mt-2 mb-2 input-text">
-                            <label className="col-sm-2 col-form-label label-text">Enater Amount to be Deposited:</label>
+                            <label className="col-sm-2 col-form-label label-text">Enter Amount to be Deposited:</label>
                             <input
                                 type='text'
-                                value={updateAmount}
+                                value={amount}
                                 size={30}
                                 className="form-control col-sm-10"
-                                onChange={handleToAddChange}
+                                onChange={handleAmountChange}
                             /> <br/><br/>
-                        </div>
+                        </div><br></br>
 
-                        <button className='counter-action decrement'> Deposit </button>
-                        <div className="form-row mt-2 mb-2 input-text">
+                        {/* <div className="form-row mt-2 mb-2 input-text">
                             <label className="col-sm-2 col-form-label label-text">Total Amount:</label>
                             <input
                                 type='text'
@@ -75,8 +76,9 @@ const Deposit = (props:depositProps) => {
                                 className="form-control col-sm-10"
                                 onChange={handleAmountChange}
                             /> <br/><br/>
-                        </div>
+                        </div> */}
 
+                        <button style={{cursor:"pointer"}} className='btn btn-warning counter-action decrement'> Deposit </button>
                     </form>
                 </div>
             </div>

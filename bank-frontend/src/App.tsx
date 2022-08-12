@@ -19,6 +19,8 @@ import FundTransfer from './components/ManagerSide/FundTransfer/PostFundTransfer
 import FundStatement from './components/ManagerSide/Statement/TransferStatement';
 import UpdateAccount from './components/ManagerSide/UpdateAccount/UpdateAccountPost';
 import BalanceInquiry from './components/ManagerSide/GetBalance/PostGetBalance';
+import DeleteAccount from './components/ManagerSide/DeleteAccount/PostDeleteAccount';
+import DeleteUser from './components/ManagerSide/DeleteCustomer/PostDeleteTransfer';
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -29,28 +31,33 @@ const App = () => {
     setIsLoggedIn(false);
   };
   const [lang, setLang] = useState('english');
-  const [navBarLoad, setNavBarLoad] = useState(< Navigation />);
-  if (isLoggedIn == true) {
-    setNavBarLoad(< NavigationLoggedIn />);
-  }
+  console.log(localStorage.getItem('checklogin'));
   return (
     <div>
       <AuthContext.Provider
-        value={{ isLoggedIn: isLoggedIn, login: login, logout: logout }}
+        value={{ isLoggedIn: isLoggedIn, login: login, logout: logout , userId : "" }}
       >
         <LanguageContext.Provider value={lang}>
           <ColorContext.Provider value='blue'>
-          < Navigation />
-            
+          {isLoggedIn == true && localStorage.getItem("checklogin") == 'ok'
+          ? (
+            < NavigationLoggedIn />
+          ) :
+          (
+            <Navigation />
+          )}
+          
             <Routes>
               <Route path='/' element={<Home />} />
+              {/* <Route path='/home' element={<Home />} /> */}
               <Route path="/login" element={<Login />} />
               <Route path='about' element={<About />} />
-              {/* <Route path='login' element={<Login />} /> */}
               <Route path='addUser' element={<AddUser />} />
               <Route path='updateUser' element={<UpdateUser />} />
+              <Route path='deleteUser' element={<DeleteUser />} />
               <Route path='addAccount' element={<AddAccount />} />
               <Route path='updateAccount' element={<UpdateAccount />}> </Route>
+              <Route path='deleteAccount' element={<DeleteAccount />}> </Route>
               <Route path='deposit' element={<Deposit />} />
               <Route path='withdrawl' element={<Withdrawl />} />
               <Route path='fundTransfer' element={<FundTransfer />}></Route>

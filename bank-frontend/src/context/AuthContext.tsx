@@ -4,6 +4,7 @@ export type AuthContextType = {
   isLoggedIn: boolean;
   login: () => void;
   logout: () => void;
+  userId : String;
 };
 const AuthContext = createContext<AuthContextType | null>(null);
 

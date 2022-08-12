@@ -13,32 +13,9 @@ const Navigation = () => {
           Home</NavLink>
         </li>
         <li>
-          <NavLink to='/addUser'>Add User</NavLink>
+          <NavLink to='/login'>Login</NavLink>
         </li>
-        <li>
-          <NavLink to='/updateUser'>Update User</NavLink>
-        </li>
-        <li>
-          <NavLink to='/addAccount'>Add Account</NavLink>
-        </li>
-        <li>
-          <NavLink to='/updateAccount'>Update Account</NavLink>
-        </li>
-        <li>
-          <NavLink to='/deposit'>Deposit</NavLink>
-        </li>
-        <li>
-          <NavLink to='/withdrawl'>Withdrawl</NavLink>
-        </li>
-        <li>
-          <NavLink to='/fundTransfer'>Fund Transfers</NavLink>
-        </li>
-        <li>
-          <NavLink to='/fundStatement'>Fund Statement</NavLink>
-        </li>
-        <li>
-          <NavLink to='/balanceInquiry'>Balance Inquiry</NavLink>
-        </li>
+    
       </ul>
     </nav>
 

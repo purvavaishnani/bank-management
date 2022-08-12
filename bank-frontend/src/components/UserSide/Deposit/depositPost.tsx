@@ -2,19 +2,20 @@ import React, { useContext } from 'react';
 import axios from 'axios';
 import Deposit from './deposit';
 import { Navigate } from 'react-router-dom';
-import './AddUser.css';
 
 type DepositProps={};
 
 const DepositPost = (props: DepositProps) => {
-    const handleDeposit = async (amount: string, updateAmount: string) => {
+    const handleDeposit = async (amount: string, accNo: string) => {
+        console.log(accNo,amount);
         try {
             const response = await axios.post(
-                'http://localhost:8000/api/deposit',
+                'http://localhost:9092/api/customer/deposit',
                 {
-                    accNo: localStorage.getItem("AccNo"),
-                    amount: amount,
-                    updateAmount: updateAmount
+                    transactionAmount: amount,
+                    toAccount:{
+                        accNumber: accNo
+                    }
                 }
             );
         } catch (err) {

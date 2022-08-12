@@ -7,24 +7,27 @@ import './withdrawl.css';
 type WithdrawProps={};
 
 const WithdrawPost = (props: WithdrawProps) => {
-    const handleWithdraw = async (amount: string, updateAmount: string) => {
+    const handleWithdraw = async (amount: string, accNo: string) => {
+        console.log(accNo,amount);
         try {
             const response = await axios.post(
-                'http://localhost:8000/api/withdraw',
+                'http://localhost:9092/api/customer/withdraw',
                 {
-                    accNo: localStorage.getItem("AccNo"),
-                    amount: amount,
-                    updateAmount: updateAmount
+                    transactionAmount: amount,
+                    fromAccount:{
+                        accNumber: accNo
+                    }
                 }
             );
         } catch (err) {
+            // alert("Insufficient Balance or Account Does Not Exist.")
             console.log(err);
         }
     };
 
     return (
         <div className='page-style'>
-            <Withdraw onWithdraw={handleWithdraw}  accNo={''}></Withdraw>
+            <Withdraw onWithdraw={handleWithdraw} ></Withdraw>
         </div>
     );
 };
