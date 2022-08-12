@@ -1,12 +1,14 @@
 package com.humber.bank.controller;
 
+import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletResponse;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,21 +16,27 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.humber.bank.entity.Account;
+import com.humber.bank.entity.Branch;
 import com.humber.bank.entity.Customer;
+import com.humber.bank.entity.Manager;
 import com.humber.bank.entity.Transaction;
+import com.humber.bank.entity.User;
 import com.humber.bank.exception.ResourceNotFoundException;
 import com.humber.bank.service.AccountService;
+import com.humber.bank.service.BranchService;
 import com.humber.bank.service.CustomerService;
 import com.humber.bank.service.TransactionService;
+import com.humber.bank.service.UserService;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/manager")
 public class ManagerController {
-	
+
 	@Autowired
 	TransactionService transactionService;
 
@@ -38,66 +46,36 @@ public class ManagerController {
 	@Autowired
 	CustomerService customerService;
 
+	@Autowired
+	BranchService branchService;
 
-	@RequestMapping(value="/adminDashboard",method = RequestMethod.GET) 
-	public void method(HttpServletResponse httpServletResponse) {
-	httpServletResponse.setHeader("Location","http://localhost:3000/MainPage");
-	 httpServletResponse.setStatus(302); 
-	 }
-
-
-
-	@GetMapping("/check")
-	public String hello() {
-		return "hello manager";
-
+	@Autowired
+	UserService userService;
+	
+	Logger logger = LoggerFactory.getLogger(ManagerController.class);
+	
+	@PostMapping("/signin")
+	public ResponseEntity<String> authenticateUser(@RequestBody User user) {
+		Map<String, String> userObj = userService.authenticateUser(user);
+		return !userObj.isEmpty() ? new ResponseEntity<>(userObj.get("msg"), HttpStatus.OK)
+				: new ResponseEntity<>(userObj.get("msg"), HttpStatus.BAD_REQUEST);
 	}
-
-    @PostMapping("/withdraw")
-	public ResponseEntity<?> withdraw(@RequestBody Transaction transaction) {
-		try {
-			Map<String, String> withdrawMap = transactionService.withdraw(transaction);
-			return !withdrawMap.isEmpty() ? new ResponseEntity<>(withdrawMap, HttpStatus.OK)
-					: new ResponseEntity<String>("Insufficient Balance", HttpStatus.BAD_REQUEST);
-		} catch (Exception exception) {
-			throw new ResourceNotFoundException(exception.getMessage());
-		}
-	}
-
-	@PostMapping("/fundTransfer")
-	public ResponseEntity<?> fundTransfer(@RequestBody Transaction transaction) {
-		try {
-			Map<String, String> fundTransferMap = transactionService.fundTransfer(transaction);
-			return !fundTransferMap.isEmpty() ? new ResponseEntity<>(fundTransferMap, HttpStatus.OK)
-					: new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} catch (Exception exception) {
-			throw new ResourceNotFoundException("Fund transfer failed");
-		}
-	}
-
-	@PostMapping("/deposit")
-	public ResponseEntity<?> deposit(@RequestBody Transaction transaction) {
-		try {
-			Map<String, String> depositMap = transactionService.deposit(transaction);
-			return !depositMap.isEmpty() ? new ResponseEntity<>(depositMap, HttpStatus.OK)
-					: new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		} catch (Exception exception) {
-			throw new ResourceNotFoundException(exception.getMessage());
-		}
-	}
-
+	
 	@PostMapping("/addCustomer")
 	public ResponseEntity<?> addCustomer(@RequestBody Customer customer) {
 		try {
 			Map<String, Customer> customerMap = customerService.addCustomer(customer);
-			System.out.println(customerMap);
+			logger.info("Customer added successfully");
 			return !customerMap.isEmpty() ? new ResponseEntity<>(customerMap, HttpStatus.OK)
 					: new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			
 		} catch (Exception exception) {
 			throw new ResourceNotFoundException(exception.getMessage());
 		}
 	}
 
+	
+	
 	@PutMapping("/updateCustomer")
 	public ResponseEntity<?> updateCustomer(@RequestBody Customer customer) {
 		try {
@@ -119,7 +97,7 @@ public class ManagerController {
 		}
 
 	}
-
+	
 	@PostMapping("/addAccount")
 	public ResponseEntity<?> addAccount(@RequestBody Account account) {
 		Map<String, Account> accountMap = accountService.addAccount(account);
@@ -145,6 +123,41 @@ public class ManagerController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
-	
-}
 
+	@GetMapping("/balanceEnquiry/{accNo}/{managerId}")
+	public ResponseEntity<?> balanceEnquiry(@PathVariable("accNo") long accNo, @PathVariable long managerId) {
+		try {
+			double balance = accountService.getBalance(accNo, managerId);
+			return balance != 0 ? new ResponseEntity<>("Account Balance: " + balance, HttpStatus.OK)
+					: new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			throw new ResourceNotFoundException("Account number is not valid");
+		}
+	}
+
+	@GetMapping("/miniStatement")
+	public ResponseEntity<?> getMiniStatement(@RequestParam("accNo") String accNum) {
+		try {
+			long accNo = Long.parseLong(accNum);
+			List<Transaction> statementList = transactionService.miniStatement(accNo);
+			return !statementList.isEmpty() ? new ResponseEntity<>(statementList, HttpStatus.OK)
+					: new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			throw new ResourceNotFoundException(exception.getMessage());
+		}
+	}
+
+	
+
+	@PostMapping("/saveBranch")
+	public ResponseEntity<?> saveBranch(@RequestBody Branch branch) {
+		try {
+			Map<String, Branch> branchMap = branchService.addBranch(branch);
+			return !branchMap.isEmpty() ? new ResponseEntity<>(branchMap, HttpStatus.OK)
+					: new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		} catch (Exception exception) {
+			throw new ResourceNotFoundException(exception.getMessage());
+		}
+	}
+
+}
